@@ -1,0 +1,15 @@
+.cache-main
+.cache-tests
+.project
+.classpath
+.settings/
+target/
+bin/
+*.iml
+*.ipr
+*.iws
+.idea
+/out
+org.scala-ide.sdt.core/META-INF/MANIFEST.MF
+org.scala-ide.sdt.update-site/site.xml
+.DS_Store
