@@ -22,9 +22,18 @@ Pensez à ajouter tel fichiers au fichier `.gitignore`
 ### Semaine 1:
 Exploiration de données (semaine 1)
 
+  Exploration des données commencées en Python. Continuer profiling avec Python et puis selon l'interpretation, la data prerocessing et modeling vont être traités en Scala ? 
+  Questions : 
+    Possibilité de faire cela. 
+    
+
 ### Semaine 2:
 Modeling  (semaine 2)
 1. Feactures selections
+
+On a des features nan, sans sens , incorrects. ils faut les laisser tonber en entier ? garder nan comme catégorie du feature ce q ui    peut biaiser le résultat.
+      => moins de données
+       =>plus de données moins pertinentes
 
 2. Model application 
   - Decision Trees
