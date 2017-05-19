@@ -17,6 +17,9 @@ Evitez d'ajouter des fichiers relatifs à l'IDE sur GitHub.<br />
 Verfifiez les fichier ajoutés avant de faire votre commit et push en utilisant `git status`, et `git reset HEAD <file>` pour ne pas inclure les fichiers non désirés dans le commit.<br />
 Pensez à ajouter tel fichiers au fichier `.gitignore`
 
+### Dataset
+https://www.kaggle.com/c/airbnb-recruiting-new-user-bookings
+
 ## Planning
 
 ### Semaine 1:
