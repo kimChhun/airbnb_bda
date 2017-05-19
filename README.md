@@ -26,6 +26,10 @@ Exploiration de données (semaine 1)
   Questions : 
     Possibilité de faire cela. 
     
+Librairie à utiliser :
+  Saddle with Scala ?
+  Other recommendations ? 
+
 
 ### Semaine 2:
 Modeling  (semaine 2)
@@ -34,9 +38,13 @@ Modeling  (semaine 2)
 On a des features nan, sans sens , incorrects. ils faut les laisser tonber en entier ? garder nan comme catégorie du feature ce q ui    peut biaiser le résultat.
       => moins de données
        =>plus de données moins pertinentes
+       =>laisser tomber le feature 
 
 2. Model application 
   - Decision Trees
+      
+      plusieurs models et tester : randomforest
+  
   - SVM
   
 ### Semaine 3:
