@@ -20,8 +20,9 @@ import org.apache.spark.mllib.evaluation._
 import org.apache.spark.mllib.tree._
 import org.apache.spark.mllib.tree.model._
 import org.apache.spark.rdd._
+import org.apache.spark.mllib.tree.RandomForest
 
-object Main {
+object SimpleRandomForestFiltered {
 
   //1: Create spark session
   val spark: SparkSession =
@@ -78,8 +79,15 @@ object Main {
     // Data processing after cleaning
     filteredDf.describe().show
 
+    import org.apache.spark.sql.functions.row_number
+    import org.apache.spark.sql.expressions.Window
+    val w = Window.partitionBy($"country_destination").orderBy($"id".asc)
+    val filteredDfToprows = filteredDf.withColumn("rn", row_number.over(w)).where($"rn" < 1300).drop("rn")
+    
+    filteredDfToprows.groupBy("country_destination").count().show
+    
     // transform variables type => from discrete to continuous
-    val doubleDf: RDD[Array[Double]] = filteredDf.drop().rdd.map(row => List[Double](
+    val doubleDf: RDD[Array[Double]] = filteredDfToprows.drop().rdd.map(row => List[Double](
       //Data.map(row.getString(row fieldIndex "id"), dataValues((row fieldIndex "id"))),
       row.getAs[Timestamp](row fieldIndex "date_account_created").getTime.toDouble,
       row.getLong(row fieldIndex "timestamp_first_active").toDouble,
@@ -110,12 +118,15 @@ object Main {
     val Array(training, test) = data.randomSplit(Array(0.8,0.2))
     
     // Modeling with Decision Tree
-    def getMetrics(model: DecisionTreeModel, data: RDD[LabeledPoint]): MulticlassMetrics = {
+    def getMetrics(model: RandomForestModel, data: RDD[LabeledPoint]): MulticlassMetrics = {
       val predictionsAndLabels = data.map(example => (model.predict(example.features), example.label)
       )
     new MulticlassMetrics(predictionsAndLabels) }
-    val model = DecisionTree.trainClassifier( training, dataValues.last.length, Map[Int,Int](), "gini", 4, 100)
-    
+
+    val categoricalFeaturesInfo = Map[Int, Int]()
+    val model = RandomForest.trainClassifier(training, 12, categoricalFeaturesInfo,
+  32, "auto", "gini", 24, 32)   
+  
     // prediction
     val metrics = getMetrics(model, test)
     println( "precision: " + metrics.precision)

@@ -20,8 +20,9 @@ import org.apache.spark.mllib.evaluation._
 import org.apache.spark.mllib.tree._
 import org.apache.spark.mllib.tree.model._
 import org.apache.spark.rdd._
+import org.apache.spark.mllib.tree.RandomForest
 
-object Main {
+object SimpleRandomForest {
 
   //1: Create spark session
   val spark: SparkSession =
@@ -110,12 +111,15 @@ object Main {
     val Array(training, test) = data.randomSplit(Array(0.8,0.2))
     
     // Modeling with Decision Tree
-    def getMetrics(model: DecisionTreeModel, data: RDD[LabeledPoint]): MulticlassMetrics = {
+    def getMetrics(model: RandomForestModel, data: RDD[LabeledPoint]): MulticlassMetrics = {
       val predictionsAndLabels = data.map(example => (model.predict(example.features), example.label)
       )
     new MulticlassMetrics(predictionsAndLabels) }
-    val model = DecisionTree.trainClassifier( training, dataValues.last.length, Map[Int,Int](), "gini", 4, 100)
-    
+
+    val categoricalFeaturesInfo = Map[Int, Int]()
+    val model = RandomForest.trainClassifier(training, 12, categoricalFeaturesInfo,
+          64, "auto", "gini", 12, 128)
+  
     // prediction
     val metrics = getMetrics(model, test)
     println( "precision: " + metrics.precision)

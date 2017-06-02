@@ -21,7 +21,7 @@ import org.apache.spark.mllib.tree._
 import org.apache.spark.mllib.tree.model._
 import org.apache.spark.rdd._
 
-object Main {
+object SimpleDecisionTree {
 
   //1: Create spark session
   val spark: SparkSession =

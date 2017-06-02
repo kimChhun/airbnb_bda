@@ -15,13 +15,11 @@ import org.apache.spark.sql._
 
 import org.apache.spark.mllib.regression._
 import org.apache.spark.mllib.linalg.{ Vector, Vectors }
-
+import org.apache.spark.mllib.classification.SVMModel
 import org.apache.spark.mllib.evaluation._
-import org.apache.spark.mllib.tree._
-import org.apache.spark.mllib.tree.model._
 import org.apache.spark.rdd._
-
-object Main {
+import org.apache.spark.mllib.classification.SVMWithSGD
+object SimpleSVM {
 
   //1: Create spark session
   val spark: SparkSession =
@@ -98,6 +96,11 @@ object Main {
       Data.map(row.getString(row fieldIndex "country_destination"), dataValues((row fieldIndex "country_destination")))
     ).toArray)
 
+    
+    def relabel(labels: RDD[LabeledPoint], classIndex: Int) : RDD[LabeledPoint] = {
+      labels.map(lb => LabeledPoint( if (lb.label == classIndex) 1.0 else 0.0, lb.features))
+    }
+    
     // Prepare data for modeling
     val features = doubleDf.map(_.slice(0,14))
     val labels = doubleDf.map(_(14))
@@ -109,15 +112,24 @@ object Main {
     // split data into two sampling : training and test
     val Array(training, test) = data.randomSplit(Array(0.8,0.2))
     
-    // Modeling with Decision Tree
-    def getMetrics(model: DecisionTreeModel, data: RDD[LabeledPoint]): MulticlassMetrics = {
-      val predictionsAndLabels = data.map(example => (model.predict(example.features), example.label)
-      )
-    new MulticlassMetrics(predictionsAndLabels) }
-    val model = DecisionTree.trainClassifier( training, dataValues.last.length, Map[Int,Int](), "gini", 4, 100)
+    // Modeling with SVM
+    // Run training algorithm to build the model
+    val numIterations = 100
+    val models = 0.to(dataValues(14 + 1).length - 1).map(classIndex => SVMWithSGD.train(relabel(training, classIndex), numIterations))
+
+    
+    def maxClass(predictions: Seq[(Int, Double)]): Double = {
+         predictions.reduce((a,b)=> if (b._2 > a._2) b else a)._1
+    }
+    
+    def getMetrics(models: Seq[SVMModel], data: RDD[LabeledPoint]): MulticlassMetrics = {
+      val classCount = models.length
+      val predictionsAndLabels = data.map(example => (
+          maxClass(0.to(classCount-1).map(i=>(i, models(i).predict(example.features)))), example.label))
+         new MulticlassMetrics(predictionsAndLabels) }
     
     // prediction
-    val metrics = getMetrics(model, test)
+    val metrics = getMetrics(models, test)
     println( "precision: " + metrics.precision)
     println( "f-score: " + metrics.fMeasure)
     println( "recall: " + metrics.recall)

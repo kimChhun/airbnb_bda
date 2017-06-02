@@ -21,7 +21,7 @@ import org.apache.spark.mllib.tree._
 import org.apache.spark.mllib.tree.model._
 import org.apache.spark.rdd._
 
-object Main {
+object DecisionTreeFiltered{
 
   //1: Create spark session
   val spark: SparkSession =
@@ -75,11 +75,22 @@ object Main {
       .filter(e => e.country_destination != null /* && !e.country_destination.equals("US")*/)
       .filter(_.signup_flow != None)
 
+    filteredDf.groupBy("country_destination").count().show
+    
+    
+    
+    import org.apache.spark.sql.functions.row_number
+    import org.apache.spark.sql.expressions.Window
+    val w = Window.partitionBy($"country_destination").orderBy($"id".asc)
+    val filteredDfToprows = filteredDf.withColumn("rn", row_number.over(w)).where($"rn" < 1300).drop("rn")
+    
+    filteredDfToprows.groupBy("country_destination").count().show
+      
     // Data processing after cleaning
-    filteredDf.describe().show
+    filteredDfToprows.describe().show
 
     // transform variables type => from discrete to continuous
-    val doubleDf: RDD[Array[Double]] = filteredDf.drop().rdd.map(row => List[Double](
+    val doubleDf: RDD[Array[Double]] = filteredDfToprows.drop().rdd.map(row => List[Double](
       //Data.map(row.getString(row fieldIndex "id"), dataValues((row fieldIndex "id"))),
       row.getAs[Timestamp](row fieldIndex "date_account_created").getTime.toDouble,
       row.getLong(row fieldIndex "timestamp_first_active").toDouble,
@@ -118,13 +129,11 @@ object Main {
     
     // prediction
     val metrics = getMetrics(model, test)
-    println( "precision: " + metrics.precision)
-    println( "f-score: " + metrics.fMeasure)
-    println( "recall: " + metrics.recall)
+    println( "accuracy: " + metrics.accuracy)
     println( "confusion matrix: \n" + metrics.confusionMatrix)
     println( "class labels" )
-    
     dataValues.last.foreach(println)
+    
     
   }
 

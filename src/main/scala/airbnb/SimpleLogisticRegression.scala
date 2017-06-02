@@ -20,8 +20,8 @@ import org.apache.spark.mllib.evaluation._
 import org.apache.spark.mllib.tree._
 import org.apache.spark.mllib.tree.model._
 import org.apache.spark.rdd._
-
-object Main {
+import org.apache.spark.mllib.classification.{LogisticRegressionModel, LogisticRegressionWithLBFGS}
+object SimpleLogisticRegression {
 
   //1: Create spark session
   val spark: SparkSession =
@@ -97,10 +97,14 @@ object Main {
       Data.map(row.getString(row fieldIndex "first_browser"), dataValues(row fieldIndex "first_browser")),
       Data.map(row.getString(row fieldIndex "country_destination"), dataValues((row fieldIndex "country_destination")))
     ).toArray)
-
+    
     // Prepare data for modeling
     val features = doubleDf.map(_.slice(0,14))
     val labels = doubleDf.map(_(14))
+    
+    println(labels)
+    println(dataValues(14 + 1))
+    
     
     val featureVectors = features.map(Vectors.dense(_))
 
@@ -110,11 +114,13 @@ object Main {
     val Array(training, test) = data.randomSplit(Array(0.8,0.2))
     
     // Modeling with Decision Tree
-    def getMetrics(model: DecisionTreeModel, data: RDD[LabeledPoint]): MulticlassMetrics = {
+    def getMetrics(model: LogisticRegressionModel, data: RDD[LabeledPoint]): MulticlassMetrics = {
       val predictionsAndLabels = data.map(example => (model.predict(example.features), example.label)
       )
     new MulticlassMetrics(predictionsAndLabels) }
-    val model = DecisionTree.trainClassifier( training, dataValues.last.length, Map[Int,Int](), "gini", 4, 100)
+    
+    
+    val model = new LogisticRegressionWithLBFGS().setNumClasses(12).run(training)
     
     // prediction
     val metrics = getMetrics(model, test)
