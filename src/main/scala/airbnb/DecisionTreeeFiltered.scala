@@ -113,6 +113,12 @@ object DecisionTreeeFiltered{
     val features = doubleDf.map(_.slice(0,14))
     val labels = doubleDf.map(_(14))
     
+    println("labels,")
+    labels.take(5).foreach(println)
+    println("features,")
+    features.take(5).foreach(println)
+    
+    /*
     val featureVectors = features.map(Vectors.dense(_))
 
     val data = labels.zip(featureVectors).map { case (x, y) => LabeledPoint(x, y) }.cache()
@@ -133,7 +139,7 @@ object DecisionTreeeFiltered{
     println( "confusion matrix: \n" + metrics.confusionMatrix)
     println( "class labels" )
     dataValues.last.foreach(println)
-    
+    */
     
   }
 
