@@ -1,8 +1,10 @@
 # Projet BDA 2017 - AirBnB New Customer Prediction
-## Context du Pprojet
-Dans le cadre du projet, nous allons relever le défit du projet "airbnb" proposé par kaggele. Nous avons à disposition une liste d'utilisateurs ainsi que leurs données démographiques, les enregistrements de session Web et certaines statistiques récapitulatives. 
+## Context du Projet
+Dans le cadre de ce projet, nous allons relever le défi du projet "airbnb" proposé par kaggele. Nous avons à disposition une liste d'utilisateurs ainsi que leurs données démographiques, les enregistrements des session Web et certaines statistiques récapitulatives. 
 
 L'objectif du projet est d'entrainer des modèles de Machine Learning sur les données disponibles afin de prédire quel pays sera la première destination de réservation d'un nouvel utilisateur.
+
+Pour ce faire nous utiliserons le framework SPARK.
 
 ## Données
 ### Lien 
@@ -32,26 +34,26 @@ Dans le cadre de ce projet, nous avons développé en Scala les traitments pour 
 
 ## Planning
 ### Semaine 1:
-Exploiration de données
-- Exploration des données commencées en Python. Continuer profiling avec Python et puis selon l'interpretation, la data prerocessing et modeling vont être traités en Scala ?
+Exploration et interprétation des données
+- Exploration des données commencées en Python. Continuer profiling avec Python et puis selon l'interpretation, le data prerocessing et modeling vont être traités en Scala ?
 
 ### Semaine 2:
 Modeling
-1. Traitement des données et Feactures selections
+1. Traitement des données et selection des Feactures
 - Gestion des données manquantes (ex: âge = null) et abérrante (ex: âge =2014)
 - Transformation des données (de discrètes en continues)
 2. Model application
 - Decision Tree, Regression Logistic, Random Forest, SVM, Multilayer Perceptron
 
 ### Semaine 3:
-Tester et évaluer des modèles
-- tester les différents hyper-paramètres et les différents algorithms pour trouver la bonne configuration
+Test et évaluation des diverses modèles
+- tester les différents hyper-paramètres et les différents algorithms pour trouver la configuration la plus optimisisé
 
 ### Semaine 4:
-Wrap up and Présentation
+Wrap up et préparation de la présentation
 
 ## Importer le Projet
-1. Télecharger le code source:
+1. Téléchargé le code source:
 1. `git clone https://github.com/kimChhun/airbnb_bda.git`
 
 #### Eclipse (Scala IDE)
