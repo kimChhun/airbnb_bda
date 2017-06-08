@@ -1,5 +1,5 @@
 # Projet BDA 2017 - AirBnB New Customer Prediction
-## Context du Projet
+## Context du projet
 Dans le cadre de ce projet, nous allons relever le défi du projet "airbnb" proposé par kaggele. Nous avons à disposition une liste d'utilisateurs ainsi que leurs données démographiques, les enregistrements des session Web et certaines statistiques récapitulatives. 
 
 L'objectif du projet est d'entrainer des modèles de Machine Learning sur les données disponibles afin de prédire quel pays sera la première destination de réservation d'un nouvel utilisateur.
@@ -40,7 +40,7 @@ Exploration et interprétation des données
 ### Semaine 2:
 Modeling
 1. Traitement des données et selection des Feactures
-- Gestion des données manquantes (ex: âge = null) et abérrante (ex: âge =2014)
+- Gestion des données manquantes (ex: âge = null) et aberrante (ex: âge =2014)
 - Transformation des données (de discrètes en continues)
 2. Model application
 - Decision Tree, Regression Logistic, Random Forest, SVM, Multilayer Perceptron
