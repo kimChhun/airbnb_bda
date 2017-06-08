@@ -1,5 +1,0 @@
-package airbnb
-
-class Normalize {
-  
-}

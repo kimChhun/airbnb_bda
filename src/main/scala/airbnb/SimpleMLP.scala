@@ -8,14 +8,11 @@ import org.apache.spark.rdd.RDD
 import scala.util.matching.Regex
 import org.apache.spark
 
-//import java.sql.Date
 import java.sql.Timestamp
 import org.apache.spark.sql.types
 import org.apache.spark.sql._
 
 import org.apache.spark.mllib.regression._
-//import org.apache.spark.mllib.linalg.Vector
-//import org.apache.spark.mllib.linalg.Vectors
 
 import org.apache.spark.mllib.evaluation._
 import org.apache.spark.mllib.tree._
@@ -56,12 +53,9 @@ object SimpleMLP {
 
  
   def main(args: Array[String]) {
-    // print("1 + 2 + ... + 10000 = " + sum(sc.parallelize(1.to(10000))) + " :)")
-
     // Read file
     val rows = spark.read.option("header", true).
       option("inferSchema", true).
-      //csv("/Users/kimtaing/Documents/github/P_bigData/data/train_users_500row.csv");
       csv("/Users/kimtaing/Documents/github/P_bigData/data/train_users_2.csv");
     
     // get number of columns, get distinct values of each column
@@ -70,7 +64,7 @@ object SimpleMLP {
     val dataValues = _dataValues.map(_.collect.toList)
     var df = rows.as[User]
 
-    // Data processing
+    // Data profiling
     df.take(10).foreach(println)
     df.printSchema()
     df.describe().show
@@ -84,7 +78,7 @@ object SimpleMLP {
       .filter(e => e.country_destination != null && !e.country_destination.equals("NDF"))
       .filter(_.signup_flow != None)
 
-    // Data processing after cleaning
+    // Data profiling after cleaning
     filteredDf.describe().show
 
     // transform variables type => from discrete to continuous
@@ -113,27 +107,14 @@ object SimpleMLP {
       Data.map(row.getString(row fieldIndex "country_destination"), dataValues((row fieldIndex "country_destination")))
     ).toArray)
 
-    println("scaledData.............")
-    doubleDf.take(10).foreach(println)
-    
+ 
     // Prepare data for modeling
     val numColTrain = doubleDf.first().toSeq.length
     println("numColTrain : ",numColTrain)
     val features = doubleDf.map(_.slice(0,numColTrain-1))
     val labels = doubleDf.map(_(numColTrain-1))
     
-    //normalization : MinMaxScaler => rescaling each feature to a specific range (often [0, 1])
-    //val featuresDF=doubleDf.map(_.slice(0,numColTrain-2)).toDF()
-//    val featuresDF = features.toDF()//spark.sqlContext.createDataFrame(features)
-//    val scaler = new MinMaxScaler()
-//        .setInputCol(featuresDF.columns(0))
-//        //.setOutputCol("scaledFeatures")
-//    val scalerModel = scaler.fit(featuresDF.map(Vectors.dense(_.toSeq.toArray)))
-//    val scaledData = scalerModel.transform(featuresDF.map(Vectors.dense(_.toSeq.toArray)))
-//    println("scaledData.............")
-//    scaledData.show()
-//    val scaledDataRdd = scaledData.rdd.map(_.toSeq.map(_.asInstanceOf[Double]).toArray)
-    
+    //normalization : 
     val maximums = features.reduce((a, b) => 0.to(a.length -1).map(i => if (a(i) > b(i)) a(i) else b(i)).toArray[Double])
     val minimums = features.reduce((a, b) => 0.to(a.length -1).map(i => if (a(i) < b(i)) a(i) else b(i)).toArray[Double])
     
@@ -142,10 +123,10 @@ object SimpleMLP {
     
     val featureVectors = normalizedFeatures.map(Vectors.dense(_))
 
+    // data base for modeling
     val data = labels.zip(featureVectors).map { case (x, y) => LabeledPoint(x, org.apache.spark.mllib.linalg.Vectors.dense(y.toArray)) }.cache()
 
     
-
     // split data into two sampling : training and test
     val Array(training, test) = data.randomSplit(Array(0.7,0.3))
     
@@ -155,11 +136,9 @@ object SimpleMLP {
                   .setLayers(Array(numColTrain-1, 25, 25, 20, dataValues.last.length))
                   .setBlockSize(256)
                   .setMaxIter(256)
-    
-                  
+
     val model = mlp.fit(training.map(lp => (Vectors.dense(lp.features.toArray), lp.label)).toDF("features", "label"))
           
-    
     //test set
     val result = model.transform(test.map(lp => (Vectors.dense(lp.features.toArray), lp.label)).toDF("features", "label"))
     val predictionsAndLabels = result.select("prediction", "label")
@@ -171,6 +150,7 @@ object SimpleMLP {
     //training set
     val trainingResult = model.transform(training.map(lp => (Vectors.dense(lp.features.toArray), lp.label)).toDF("features", "label"))
     val trainingPredictionsAndLabels = trainingResult.select("prediction", "label")
+    
     val trainingEvaluator = new MulticlassClassificationEvaluator().setMetricName("accuracy")
     
     println("training set accuracy = " + trainingEvaluator.evaluate(trainingPredictionsAndLabels))

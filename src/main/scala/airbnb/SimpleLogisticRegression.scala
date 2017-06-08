@@ -48,8 +48,6 @@ object SimpleLogisticRegression {
 
  
   def main(args: Array[String]) {
-    // print("1 + 2 + ... + 10000 = " + sum(sc.parallelize(1.to(10000))) + " :)")
-
     // Read file
     val rows = spark.read.option("header", true).
       option("inferSchema", true).

@@ -48,8 +48,6 @@ object DecisionTreeeFiltered{
 
  
   def main(args: Array[String]) {
-    // print("1 + 2 + ... + 10000 = " + sum(sc.parallelize(1.to(10000))) + " :)")
-
     // Read file
     val rows = spark.read.option("header", true).
       option("inferSchema", true).
@@ -76,8 +74,6 @@ object DecisionTreeeFiltered{
       .filter(_.signup_flow != None)
 
     filteredDf.groupBy("country_destination").count().show
-    
-    
     
     import org.apache.spark.sql.functions.row_number
     import org.apache.spark.sql.expressions.Window
@@ -118,7 +114,7 @@ object DecisionTreeeFiltered{
     println("features,")
     features.take(5).foreach(println)
     
-    /*
+    
     val featureVectors = features.map(Vectors.dense(_))
 
     val data = labels.zip(featureVectors).map { case (x, y) => LabeledPoint(x, y) }.cache()
@@ -139,7 +135,7 @@ object DecisionTreeeFiltered{
     println( "confusion matrix: \n" + metrics.confusionMatrix)
     println( "class labels" )
     dataValues.last.foreach(println)
-    */
+    
     
   }
 
